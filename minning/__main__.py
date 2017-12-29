@@ -1,3 +1,5 @@
+import re
+import collections
 import numpy
 import pandas as pd
 import os
@@ -11,15 +13,22 @@ def main():
 
 
 def text_miner(direc):
-    stop_words = pd.read_csv(os.path.join(os.path.dirname((os.path.dirname(__file__))), 'stopwords.txt'), sep=",", header=None).values
+    stop_words = pd.read_csv(os.path.join(os.path.dirname((os.path.dirname(__file__))), 'stopwords.txt'), sep=",", header=None).values[0]
+    stop_words = numpy.char.array(stop_words).upper()
     for fl in os.listdir(direc):
         if os.path.isfile(os.path.join(direc, fl)):
-            with open (os.path.join(direc, fl)) as fle:
+            with open(os.path.join(direc, fl)) as fle:
                 lines = fle.readlines()
-                ln = reduce(lambda x : x.strip().split(" "), lines)
+                # ln = map(lambda x : x.strip().split(" "), lines)
                 arr = numpy.array([])
-
-                arr = numpy.array(ln)
+                for ln in lines:
+                    words = re.sub(" +", " ", ln).strip().split(" ")
+                    if words[0] != '':
+                        words = map((lambda x:  re.sub('[^A-Za-z0-9]+', '', x.upper())), words)
+                        arr = numpy.append(arr, words)
+                # arr = numpy.array(ln)
+                arr = numpy.vstack(numpy.unique(arr, return_counts=True)).T
+                # arr = numpy.ma.masked_array(t.keys(), mask=())
                 d = numpy.setdiff1d(arr, stop_words)
 
             numpy.load(os.path.join(direc, fl))
