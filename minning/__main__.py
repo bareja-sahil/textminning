@@ -23,13 +23,18 @@ def text_miner(direc):
                 arr = numpy.array([])
                 for ln in lines:
                     words = re.sub(" +", " ", ln).strip().split(" ")
+                    # To remove extra spaces from a word then split with word wise.
                     if words[0] != '':
                         words = map((lambda x:  re.sub('[^A-Za-z0-9]+', '', x.upper())), words)
                         arr = numpy.append(arr, words)
                 # arr = numpy.array(ln)
                 arr = numpy.vstack(numpy.unique(arr, return_counts=True)).T
                 # arr = numpy.ma.masked_array(t.keys(), mask=())
+                st = stop_words.reshape(len(stop_words), 1)[:, None]
                 d = numpy.setdiff1d(arr, stop_words)
+                stop_words.reshape(len(stop_words), 1)[:, None] == arr
+
+
 
             numpy.load(os.path.join(direc, fl))
 
